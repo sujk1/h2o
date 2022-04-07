@@ -1,0 +1,36 @@
+from keras.models import load_model
+from PIL import Image, ImageOps
+import numpy as np
+import cv2
+
+img = cv2.imread('img.jpg')
+cv2.imshow('img.jpg',img)
+model = load_model('keras_model.h5')
+
+
+data = np.ndarray(shape=(1, 224, 224, 3), dtype=np.float32)
+
+image = Image.open('img.jpg')
+
+size = (224, 224)
+image = ImageOps.fit(image, size, Image.ANTIALIAS)
+
+image_array = np.asarray(image)
+
+normalized_image_array = (image_array.astype(np.float32) / 127.0) - 1
+
+data[0]=normalized_image_array
+
+prediction = model.predict(data)
+print(prediction)
+
+def predict(data):
+    prediction = model.predict(data)
+    p=prediction[0]
+    for i in range(len(p)):
+        if p[i] == max(p):
+            break
+    f=open("labels.txt","r")
+    label=f.readlines()    
+    return label[i][2:-1]
+print(predict(data))
